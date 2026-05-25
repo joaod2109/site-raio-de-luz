@@ -58,9 +58,17 @@ MINISTERIOS = [
     {"icone": "📖", "nome": "Formação", "descricao": "Cursos, retiros e encontros para crescimento espiritual e humano."},
     {"icone": "🌍", "nome": "Missão", "descricao": "Equipes missionárias que levam a fé para além das fronteiras."},
     {"icone": "👶", "nome": "Infância & Juventude", "descricao": "Espaços especiais para crianças, adolescentes e jovens."},
-]
+ ]
 
-EVENTOS = [{"titulo": "NENHUM EVENTO NO MOMENTO"}]
+# Lista de Eventos estruturada com ID para permitir a edição no painel administrativo
+EVENTOS = [
+    {
+        "id": 1, 
+        "titulo": "NENHUM EVENTO NO MOMENTO", 
+        "data": "A definir", 
+        "descricao": "Fique atento às nossas redes sociais para acompanhar os próximos eventos da comunidade."
+    }
+]
 
 # ── ROTAS PÚBLICAS DO SITE ────────────────────────────────────────────────────
 @app.route("/")
@@ -86,7 +94,7 @@ def contato():
         email    = request.form.get("email", "").strip()
         mensagem = request.form.get("mensagem", "").strip()
 
-        if not nome or not email or not mensagem:
+        if not nome or not email or not message:
             flash("Por favor, preencha todos os campos.", "erro")
         else:
             # 1. Guarda a mensagem localmente para que apareça no painel admin do site
@@ -149,8 +157,26 @@ def login():
 @app.route('/admin')
 @login_required
 def admin_dashboard():
-    # Renderiza diretamente o ficheiro admin.html que está solto na tua pasta templates
-    return render_template('admin.html', org=ORG, mensagens=MENSAGENS_DB)
+    # Passa também a lista de eventos para poder ser gerenciada no admin.html
+    return render_template('admin.html', org=ORG, mensagens=MENSAGENS_DB, eventos=EVENTOS)
+
+@app.route("/admin/evento/editar/<int:evento_id>", methods=["POST"])
+@login_required
+def editar_evento(evento_id):
+    novo_titulo = request.form.get("titulo", "").strip()
+    nova_data = request.form.get("data", "").strip()
+    nova_descricao = request.form.get("descricao", "").strip()
+    
+    # Procura o evento na lista global e altera os dados
+    for ev in EVENTOS:
+        if ev.get("id") == evento_id:
+            ev["titulo"] = novo_titulo
+            ev["data"] = nova_data
+            ev["descricao"] = nova_descricao
+            break
+            
+    flash("Evento atualizado com sucesso!", "sucesso")
+    return redirect(url_for("admin_dashboard"))
 
 @app.route('/logout')
 @login_required
