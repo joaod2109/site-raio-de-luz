@@ -94,7 +94,7 @@ def contato():
         email    = request.form.get("email", "").strip()
         mensagem = request.form.get("mensagem", "").strip()
 
-        if not nome or not email or not message:
+        if not nome or not email or not mensagem:
             flash("Por favor, preencha todos os campos.", "erro")
         else:
             # 1. Guarda a mensagem localmente para que apareça no painel admin do site
