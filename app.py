@@ -43,8 +43,8 @@ ORG = {
     "telefone": "+55 (45) 99955-0227",
     "endereco": "Comunidade 100% Online — Onde você estiver!",
     "instagram": "https://instagram.com/comunidaderaiodeluz",
-    "youtube": "https://youtube.com/@raiodeltuz",
-    "id_video_ao_vivo": "dQw4w9WgXcQ"
+    "youtube": "https://youtube.com/@raiodeluz",
+    "id_video_ao_vivo": "HlG5T7FGHng"
 }
 
 MINISTERIOS = [
