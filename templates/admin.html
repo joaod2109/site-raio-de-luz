@@ -19,7 +19,19 @@
         .btn-site { background-color: #495057; color: white; padding: 10px 18px; text-decoration: none; border-radius: 4px; font-weight: bold; margin-right: 10px; border: none; cursor: pointer; display: inline-block; }
         .btn-site:hover { background-color: #6c757d; }
         .badge-origem { background: #2c2200; color: #f3cd4a; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid #614e0b; }
+        .badge-oracao { background: #1b2e1b; color: #81c784; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid #2e7d32; }
         .alert-flash { padding: 15px; margin-top: 15px; border-radius: 4px; font-weight: bold; background-color: #2e7d32; color: #fff; }
+        
+        label { font-weight: bold; color: #aaa; display: block; margin-top: 10px; }
+        input[type="text"], select, textarea {
+            width: 100%; padding: 10px; margin-top: 5px; background: #252525; border: 1px solid #333; color: #fff; border-radius: 4px; box-sizing: border-box;
+        }
+        .modal-bg {
+            display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;
+        }
+        .modal-body {
+            background:#1e1e1e; padding:30px; border-radius:8px; border:1px solid #333; width:90%; max-width:500px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
@@ -40,7 +52,6 @@
         {% endif %}
     {% endwith %}
 
-    <!-- TABELA DE MENSAGENS -->
     <div class="admin-box">
         <h3>📩 Mensagens de Contato Recebidas</h3>
         <table>
@@ -64,26 +75,47 @@
         </table>
     </div>
 
-    <!-- TABELA DE LINKS DOS GRUPOS MEET/ZOOM -->
     <div class="admin-box" style="margin-top: 40px;">
-        <h3>🔗 Links das Salas Virtuais (Grupos Online)</h3>
-        <p style="color: #aaa;">Altere aqui as URLs de reuniões. O botão no site só ativa no dia correspondente.</p>
+        <h3>🙏 Pedidos de Oração Recebidos</h3>
         <table>
             <thead>
-                <tr><th>Grupo</th><th>Dia da Reunião</th><th>Horário</th><th>Link Atual da Sala</th><th>Ação</th></tr>
+                <tr><th>Quem Pediu</th><th>Status</th><th>Pedido de Oração</th></tr>
+            </thead>
+            <tbody>
+                {% if oracoes %}
+                    {% for orac in oracoes %}
+                        <tr>
+                            <td style="font-weight: bold; color: #ffffff;">{{ orac.nome }}</td>
+                            <td><span class="badge-oracao">Em Oração</span></td>
+                            <td style="max-width: 600px; word-wrap: break-word;">{{ orac.pedido }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="3" style="text-align: center; color: #777; font-style: italic;">Nenhum pedido recebido.</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="admin-box" style="margin-top: 40px;">
+        <h3>🔗 Nossos Grupos de Conexão Online</h3>
+        <table>
+            <thead>
+                <tr><th>Nome da Sala</th><th>Liderança</th><th>Dia</th><th>Horário</th><th>Link Atual</th><th>Ação</th></tr>
             </thead>
             <tbody>
                 {% for gp in grupos %}
                     <tr>
                         <td style="font-weight: bold; color: #ffffff;">{{ gp.nome }}</td>
+                        <td>{{ gp.lider }}</td>
                         <td>{{ gp.dia_nome }}</td>
                         <td>{{ gp.horario }}</td>
-                        <td style="color: #9cdcfe; font-family: monospace; font-size: 13px;">{{ gp.link }}</td>
+                        <td style="color: #9cdcfe; font-family: monospace; font-size: 13px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ gp.link }}</td>
                         <td>
-                            <form method="POST" action="/admin/grupo/editar/{{ gp.id }}" style="display: flex; gap: 5px;">
-                                <input type="text" name="link" value="{{ gp.link }}" required style="padding: 6px; background: #252525; border: 1px solid #444; color: #fff; border-radius: 4px; width: 200px;">
-                                <button type="submit" class="btn-site" style="background: #2e7d32; padding: 6px 12px; margin: 0;">Salvar</button>
-                            </form>
+                            <button class="btn-site" style="background-color: #f3cd4a; color: #121212; margin: 0; padding: 6px 14px;" 
+                                    onclick="abrirModalGrupo('{{ gp.id }}', '{{ gp.nome }}', '{{ gp.lider }}', '{{ gp.dia_nome }}', '{{ gp.dia_semana }}', '{{ gp.horario }}', '{{ gp.link }}')">
+                                Editar
+                            </button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -91,7 +123,6 @@
         </table>
     </div>
 
-    <!-- TABELA DE GESTÃO DE EVENTOS -->
     <div class="admin-box" style="margin-top: 40px;">
         <h3>📅 Gestão de Eventos</h3>
         <table>
@@ -113,24 +144,69 @@
         </table>
     </div>
 
-    <!-- MODAL POP-UP DE EDIÇÃO DE EVENTO -->
-    <div id="modalEditar" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
-        <div style="background:#1e1e1e; padding:30px; border-radius:8px; border:1px solid #333; width:90%; max-width:500px;">
+    <div id="modalGrupo" class="modal-bg">
+        <div class="modal-body">
+            <h3 style="color:#f3cd4a; margin-top:0;">🌐 Editar Grupo de Conexão</h3>
+            <form id="formEditarGrupo" method="POST" action="">
+                <div>
+                    <label>Nome da Sala / Célula:</label>
+                    <input type="text" id="gp_nome" name="nome" required>
+                </div>
+                <div>
+                    <label>Líder / Responsáveis:</label>
+                    <input type="text" id="gp_lider" name="lider" required>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label>Dia por Extenso:</label>
+                        <input type="text" id="gp_dia_nome" name="dia_nome" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Dia para o Sistema:</label>
+                        <select id="gp_dia_semana" name="dia_semana" required>
+                            <option value="0">Segunda-feira</option>
+                            <option value="1">Terça-feira</option>
+                            <option value="2">Quarta-feira</option>
+                            <option value="3">Quinta-feira</option>
+                            <option value="4">Sexta-feira</option>
+                            <option value="5">Sábado</option>
+                            <option value="6">Domingo</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label>Horário da Reunião:</label>
+                    <input type="text" id="gp_horario" name="horario" required>
+                </div>
+                <div>
+                    <label>Link do Meet / Zoom:</label>
+                    <input type="text" id="gp_link" name="link" required>
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top: 20px;">
+                    <button type="button" class="btn-site" onclick="fecharModalGrupo()" style="background:#495057; margin:0;">Cancelar</button>
+                    <button type="submit" class="btn-site" style="background:#f3cd4a; color:#121212; margin:0;">Salvar Grupo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalEditar" class="modal-bg">
+        <div class="modal-body">
             <h3 style="color:#f3cd4a; margin-top:0;">✏️ Editar Evento</h3>
-            <form id="formEditarEvento" method="POST" action="">
-                <div style="margin-bottom:15px;">
+            <form id="formEditarEventos" method="POST" action="">
+                <div>
                     <label>Título:</label>
-                    <input type="text" id="edit_titulo" name="titulo" required style="width:100%; padding:10px; background:#252525; border:1px solid #333; color:#fff; border-radius:4px; box-sizing: border-box;">
+                    <input type="text" id="edit_titulo" name="titulo" required>
                 </div>
-                <div style="margin-bottom:15px;">
+                <div>
                     <label>Data:</label>
-                    <input type="text" id="edit_data" name="data" required style="width:100%; padding:10px; background:#252525; border:1px solid #333; color:#fff; border-radius:4px; box-sizing: border-box;">
+                    <input type="text" id="edit_data" name="data" required>
                 </div>
-                <div style="margin-bottom:15px;">
+                <div>
                     <label>Descrição:</label>
-                    <textarea id="edit_descricao" name="descricao" rows="4" required style="width:100%; padding:10px; background:#252525; border:1px solid #333; color:#fff; border-radius:4px; resize:none; box-sizing: border-box;"></textarea>
+                    <textarea id="edit_descricao" name="descricao" rows="4" required></textarea>
                 </div>
-                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top: 20px;">
                     <button type="button" class="btn-site" onclick="fecharModal()" style="background:#495057; margin:0;">Cancelar</button>
                     <button type="submit" class="btn-site" style="background:#f3cd4a; color:#121212; margin:0;">Salvar</button>
                 </div>
@@ -139,11 +215,23 @@
     </div>
 
     <script>
+        function abrirModalGrupo(id, nome, lider, dia_nome, dia_semana, horario, link) {
+            document.getElementById('gp_nome').value = nome;
+            document.getElementById('gp_lider').value = lider;
+            document.getElementById('gp_dia_nome').value = dia_nome;
+            document.getElementById('gp_dia_semana').value = dia_semana;
+            document.getElementById('gp_horario').value = horario;
+            document.getElementById('gp_link').value = link;
+            document.getElementById('formEditarGrupo').action = "/admin/grupo/editar/" + id;
+            document.getElementById('modalGrupo').style.display = 'flex';
+        }
+        function fecharModalGrupo() { document.getElementById('modalGrupo').style.display = 'none'; }
+
         function abrirModalEditar(id, titulo, data, descricao) {
             document.getElementById('edit_titulo').value = titulo;
             document.getElementById('edit_data').value = data;
             document.getElementById('edit_descricao').value = descricao;
-            document.getElementById('formEditarEvento').action = "/admin/evento/editar/" + id;
+            document.getElementById('formEditarEventos').action = "/admin/evento/editar/" + id;
             document.getElementById('modalEditar').style.display = 'flex';
         }
         function fecharModal() { document.getElementById('modalEditar').style.display = 'none'; }

@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_mail import Mail, Message
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -43,8 +43,8 @@ ORG = {
     "telefone": "+55 (45) 99955-0227",
     "endereco": "Comunidade 100% Online — Onde você estiver!",
     "instagram": "https://instagram.com/comunidaderaiodeluz",
-    "youtube": "https://youtube.com/@raiodeluz",
-    "id_video_ao_vivo": "HlG5T7FGHng"
+    "youtube": "https://youtube.com/@raiodeltuz",
+    "id_video_ao_vivo": "dQw4w9WgXcQ"
 }
 
 MINISTERIOS = [
@@ -56,10 +56,10 @@ MINISTERIOS = [
     {"icone": "👶", "nome": "Infância & Juventude", "descricao": "Espaços especiais para crianças, adolescentes e jovens."},
 ]
 
-# GRUPOS ONLINE COM DIAS VIA NÚMERO (0=Segunda, 1=Terça, 2=Quarta, 3=Quinta, 4=Sexta, 5=Sábado, 6=Domingo)
+# GRUPOS ONLINE INICIAIS
 GRUPOS_ONLINE = [
-    {"id": 1, "nome": "Conexão Jovem", "dia_nome": "Terça-feira", "dia_semana": 1, "horario": "20:00", "lider": "Coordenador da Comunidade", "link": "https://meet.google.com/abc-defg-hij"},
-    {"id": 2, "nome": "Conexão Jovem", "dia_nome": "Sábado", "dia_semana": 5, "horario": "19:30", "lider": "Coordenador da Comunidade", "link": "https://meet.google.com/xyz-uvw-rst"},
+    {"id": 1, "nome": "Conexão Jovem", "dia_nome": "Terça-feira", "dia_semana": 1, "horario": "20:00", "lider": "Lucas & Sara", "link": "https://meet.google.com/abc-defg-hij"},
+    {"id": 2, "nome": "Célula Famílias", "dia_nome": "Quinta-feira", "dia_semana": 3, "horario": "19:30", "lider": "Roberto & Maria", "link": "https://zoom.us/j/123456789"},
 ]
 
 EVENTOS = [
@@ -71,11 +71,15 @@ EVENTOS = [
     }
 ]
 
+# Função auxiliar para garantir o dia da semana correto no fuso horário do Brasil (UTC-3)
+def obter_dia_semana_brasil():
+    fuso_brasil = timezone(timedelta(hours=-3))
+    return datetime.now(fuso_brasil).weekday()
+
 # ── ROTAS PÚBLICAS DO SITE ────────────────────────────────────────────────────
 @app.route("/")
 def index():
-    # Pega o número do dia da semana de hoje (0 a 6)
-    dia_hoje = datetime.now().weekday()
+    dia_hoje = obter_dia_semana_brasil()
     return render_template("index.html", org=ORG, ministerios=MINISTERIOS, eventos=EVENTOS, grupos=GRUPOS_ONLINE, dia_hoje=dia_hoje)
 
 @app.route("/sobre")
@@ -157,15 +161,19 @@ def editar_evento(evento_id):
     flash("Evento atualizado com sucesso!", "sucesso")
     return redirect(url_for("admin_dashboard"))
 
-# ROTA NOVA: EDITAR LINK DO MEET DO GRUPO
 @app.route("/admin/grupo/editar/<int:grupo_id>", methods=["POST"])
 @login_required
 def editar_grupo(grupo_id):
     for gp in GRUPOS_ONLINE:
-        if gp.get("id") == grupo_id:
+        if gp.get("id") == group_id or gp.get("id") == grupo_id:
+            gp["nome"] = request.form.get("nome", "").strip()
+            gp["lider"] = request.form.get("lider", "").strip()
+            gp["horario"] = request.form.get("horario", "").strip()
+            gp["dia_nome"] = request.form.get("dia_nome", "").strip()
+            gp["dia_semana"] = int(request.form.get("dia_semana"))
             gp["link"] = request.form.get("link", "").strip()
             break
-    flash("Link do grupo online atualizado!", "sucesso")
+    flash("Grupo online atualizado com sucesso!", "sucesso")
     return redirect(url_for("admin_dashboard"))
 
 @app.route('/logout')
