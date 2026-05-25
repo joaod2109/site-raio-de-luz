@@ -44,7 +44,7 @@ ORG = {
     "endereco": "Comunidade 100% Online — Onde você estiver!",
     "instagram": "https://instagram.com/comunidaderaiodeluz",
     "youtube": "https://youtube.com/@raiodeltuz",
-    "id_video_ao_vivo": "dQw4w9WgXcQ"
+    "id_video_ao_vivo": "HlG5T7FGHng"
 }
 
 MINISTERIOS = [
