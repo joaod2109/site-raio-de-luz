@@ -6,221 +6,133 @@
     <title>Painel Admin - Raio de Luz</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        body {
-            padding: 30px;
-            max-width: 1100px;
-            margin: 0 auto;
-            font-family: sans-serif;
-            background-color: #121212; /* Fundo escuro geral */
-            color: #f5f5f5; /* Texto claro */
-        }
-        .header-panel {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #333333;
-            padding-bottom: 15px;
-        }
-        .header-panel h2 {
-            color: #f3cd4a; /* Dourado de destaque */
-        }
-        .admin-box {
-            background: #1e1e1e; /* Fundo do card em cinza escuro */
-            border: 1px solid #333333;
-            padding: 30px;
-            border-radius: 8px;
-            margin-top: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-        .admin-box h3 {
-            color: #f5f5f5;
-            margin-bottom: 5px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 14px;
-            border-bottom: 1px solid #333333;
-            text-align: left;
-        }
-        th {
-            background-color: #252525;
-            color: #f3cd4a; /* Dourado no cabeçalho da tabela */
-            font-weight: bold;
-        }
-        tr:hover {
-            background-color: #252525; /* Destaque ao passar o rato na linha */
-        }
-        td {
-            color: #e0e0e0;
-        }
-        .btn-logout {
-            background-color: #bb2d3b;
-            color: white;
-            padding: 10px 18px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-            transition: 0.2s;
-            cursor: pointer;
-        }
-        .btn-logout:hover {
-            background-color: #b02a37;
-        }
-        .btn-site {
-            background-color: #495057;
-            color: white;
-            padding: 10px 18px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-right: 10px;
-            transition: 0.2s;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
-        }
-        .btn-site:hover {
-            background-color: #6c757d;
-        }
-        .badge-origem {
-            background: #2c2200; 
-            color: #f3cd4a; 
-            padding: 4px 10px; 
-            border-radius: 4px; 
-            font-size: 12px;
-            font-weight: bold;
-            border: 1px solid #614e0b;
-        }
-        .alert-flash {
-            padding: 15px; 
-            margin-top: 15px; 
-            border-radius: 4px; 
-            font-weight: bold; 
-            background-color: #2e7d32; 
-            color: #fff;
-            border: 1px solid #1b5e20;
-        }
+        body { padding: 30px; max-width: 1100px; margin: 0 auto; font-family: sans-serif; background-color: #121212; color: #f5f5f5; }
+        .header-panel { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #333333; padding-bottom: 15px; }
+        .header-panel h2 { color: #f3cd4a; }
+        .admin-box { background: #1e1e1e; border: 1px solid #333333; padding: 30px; border-radius: 8px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 14px; border-bottom: 1px solid #333333; text-align: left; }
+        th { background-color: #252525; color: #f3cd4a; font-weight: bold; }
+        tr:hover { background-color: #252525; }
+        td { color: #e0e0e0; }
+        .btn-logout { background-color: #bb2d3b; color: white; padding: 10px 18px; text-decoration: none; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; }
+        .btn-site { background-color: #495057; color: white; padding: 10px 18px; text-decoration: none; border-radius: 4px; font-weight: bold; margin-right: 10px; border: none; cursor: pointer; display: inline-block; }
+        .btn-site:hover { background-color: #6c757d; }
+        .badge-origem { background: #2c2200; color: #f3cd4a; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid #614e0b; }
+        .alert-flash { padding: 15px; margin-top: 15px; border-radius: 4px; font-weight: bold; background-color: #2e7d32; color: #fff; }
     </style>
 </head>
 <body>
 
     <div class="header-panel">
-        <h2>Painel de Controle Administrativo</h2>
+        <h2>Painel de Controle Administrativo - Raio de Luz</h2>
         <div>
             <a href="{{ url_for('index') }}" class="btn-site">Ver Site</a>
             <a href="{{ url_for('logout') }}" class="btn-logout">Sair</a>
         </div>
     </div>
 
-    {% with mensagens_flash = get_flashed_messages(with_categories=true) %}
+    {% with mensagens_flash = get_flashed_messages() %}
         {% if mensagens_flash %}
-            {% for categoria, mensagem in mensagens_flash %}
-                <div class="alert-flash">
-                    {{ mensagem }}
-                </div>
+            {% for mensagem in mensagens_flash %}
+                <div class="alert-flash">{{ mensagem }}</div>
             {% endfor %}
         {% endif %}
     {% endwith %}
 
+    <!-- TABELA DE MENSAGENS -->
     <div class="admin-box">
         <h3>📩 Mensagens de Contato Recebidas</h3>
-        <p style="color: #aaaaaa; margin-bottom: 15px;">Estas são as mensagens que os utilizadores enviaram através do formulário de contacto do site:</p>
-        
         <table>
             <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>E-mail</th>
-                    <th>Origem</th>
-                    <th>Mensagem</th>
-                </tr>
+                <tr><th>Nome</th><th>E-mail</th><th>Origem</th><th>Mensagem</th></tr>
             </thead>
             <tbody>
                 {% if mensagens %}
                     {% for msg in mensagens %}
                         <tr>
                             <td style="font-weight: bold; color: #ffffff;">{{ msg.nome }}</td>
-                            <td style="color: #b3b3b3;">{{ msg.email }}</td>
+                            <td>{{ msg.email }}</td>
                             <td><span class="badge-origem">{{ msg.assunto }}</span></td>
-                            <td style="color: #e0e0e0; max-width: 400px; word-wrap: break-word;">{{ msg.mensagem }}</td>
+                            <td style="max-width: 400px; word-wrap: break-word;">{{ msg.mensagem }}</td>
                         </tr>
                     {% endfor %}
                 {% else %}
-                    <tr>
-                        <td colspan="4" style="text-align: center; padding: 40px; color: #777777; font-style: italic;">
-                            Nenhuma mensagem recebida até ao momento. Faça um teste na página de contacto!
-                        </td>
-                    </tr>
+                    <tr><td colspan="4" style="text-align: center; color: #777;">Nenhuma mensagem recebida.</td></tr>
                 {% endif %}
             </tbody>
         </table>
     </div>
 
+    <!-- TABELA DE LINKS DOS GRUPOS MEET/ZOOM -->
     <div class="admin-box" style="margin-top: 40px;">
-        <h3>📅 Gestão de Eventos</h3>
-        <p style="color: #aaaaaa; margin-bottom: 15px;">Altere em tempo real as informações sobre os eventos que aparecem na página principal:</p>
-        
+        <h3>🔗 Links das Salas Virtuais (Grupos Online)</h3>
+        <p style="color: #aaa;">Altere aqui as URLs de reuniões. O botão no site só ativa no dia correspondente.</p>
         <table>
             <thead>
-                <tr>
-                    <th>Título do Evento</th>
-                    <th>Data / Horário</th>
-                    <th>Descrição</th>
-                    <th>Ações</th>
-                </tr>
+                <tr><th>Grupo</th><th>Dia da Reunião</th><th>Horário</th><th>Link Atual da Sala</th><th>Ação</th></tr>
             </thead>
             <tbody>
-                {% if eventos %}
-                    {% for ev in eventos %}
-                        {% if ev.id %}
-                            <tr>
-                                <td style="font-weight: bold; color: #ffffff;">{{ ev.titulo }}</td>
-                                <td style="color: #b3b3b3; white-space: nowrap;">{{ ev.data }}</td>
-                                <td style="color: #e0e0e0; max-width: 400px; word-wrap: break-word;">{{ ev.descricao }}</td>
-                                <td>
-                                    <button class="btn-site" style="background-color: #f3cd4a; color: #121212; margin-right: 0;" 
-                                            onclick="abrirModalEditar('{{ ev.id }}', '{{ ev.titulo }}', '{{ ev.data }}', '{{ ev.descricao }}')">
-                                        Editar
-                                    </button>
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="4" style="text-align: center; padding: 20px; color: #777777;">
-                                    {{ ev.titulo }} (Edite esta linha para criar o primeiro evento real)
-                                </td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
+                {% for gp in grupos %}
+                    <tr>
+                        <td style="font-weight: bold; color: #ffffff;">{{ gp.nome }}</td>
+                        <td>{{ gp.dia_nome }}</td>
+                        <td>{{ gp.horario }}</td>
+                        <td style="color: #9cdcfe; font-family: monospace; font-size: 13px;">{{ gp.link }}</td>
+                        <td>
+                            <form method="POST" action="/admin/grupo/editar/{{ gp.id }}" style="display: flex; gap: 5px;">
+                                <input type="text" name="link" value="{{ gp.link }}" required style="padding: 6px; background: #252525; border: 1px solid #444; color: #fff; border-radius: 4px; width: 200px;">
+                                <button type="submit" class="btn-site" style="background: #2e7d32; padding: 6px 12px; margin: 0;">Salvar</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
 
+    <!-- TABELA DE GESTÃO DE EVENTOS -->
+    <div class="admin-box" style="margin-top: 40px;">
+        <h3>📅 Gestão de Eventos</h3>
+        <table>
+            <thead>
+                <tr><th>Título do Evento</th><th>Data / Horário</th><th>Descrição</th><th>Ações</th></tr>
+            </thead>
+            <tbody>
+                {% for ev in eventos %}
+                    <tr>
+                        <td style="font-weight: bold; color: #ffffff;">{{ ev.titulo }}</td>
+                        <td>{{ ev.data }}</td>
+                        <td>{{ ev.descricao }}</td>
+                        <td>
+                            <button class="btn-site" style="background-color: #f3cd4a; color: #121212; margin: 0;" onclick="abrirModalEditar('{{ ev.id }}', '{{ ev.titulo }}', '{{ ev.data }}', '{{ ev.descricao }}')">Editar</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- MODAL POP-UP DE EDIÇÃO DE EVENTO -->
     <div id="modalEditar" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
-        <div style="background:#1e1e1e; padding:30px; border-radius:8px; border:1px solid #333; width:90%; max-width:500px; color:#fff; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
-            <h3 style="color:#f3cd4a; margin-top:0; margin-bottom: 20px;">✏️ Editar Evento</h3>
+        <div style="background:#1e1e1e; padding:30px; border-radius:8px; border:1px solid #333; width:90%; max-width:500px;">
+            <h3 style="color:#f3cd4a; margin-top:0;">✏️ Editar Evento</h3>
             <form id="formEditarEvento" method="POST" action="">
                 <div style="margin-bottom:15px;">
-                    <label style="font-weight: bold; color: #aaa;">Título do Evento:</label>
-                    <input type="text" id="edit_titulo" name="titulo" required style="width:100%; padding:10px; margin-top:5px; background:#252525; border:1px solid #333; color:#fff; border-radius:4px; box-sizing: border-box;">
+                    <label>Título:</label>
+                    <input type="text" id="edit_titulo" name="titulo" required style="width:100%; padding:10px; background:#252525; border:1px solid #333; color:#fff; border-radius:4px; box-sizing: border-box;">
                 </div>
                 <div style="margin-bottom:15px;">
-                    <label style="font-weight: bold; color: #aaa;">Data / Horário:</label>
-                    <input type="text" id="edit_data" name="data" required style="width:100%; padding:10px; margin-top:5px; background:#252525; border:1px solid #333; color:#fff; border-radius:4px; box-sizing: border-box;">
+                    <label>Data:</label>
+                    <input type="text" id="edit_data" name="data" required style="width:100%; padding:10px; background:#252525; border:1px solid #333; color:#fff; border-radius:4px; box-sizing: border-box;">
                 </div>
                 <div style="margin-bottom:15px;">
-                    <label style="font-weight: bold; color: #aaa;">Descrição:</label>
-                    <textarea id="edit_descricao" name="descricao" rows="4" required style="width:100%; padding:10px; margin-top:5px; background:#252525; border:1px solid #333; color:#fff; border-radius:4px; resize:none; box-sizing: border-box;"></textarea>
+                    <label>Descrição:</label>
+                    <textarea id="edit_descricao" name="descricao" rows="4" required style="width:100%; padding:10px; background:#252525; border:1px solid #333; color:#fff; border-radius:4px; resize:none; box-sizing: border-box;"></textarea>
                 </div>
-                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top: 20px;">
-                    <button type="button" class="btn-site" onclick="fecharModal()" style="background:#495057; margin-right: 0;">Cancelar</button>
-                    <button type="submit" class="btn-site" style="background:#f3cd4a; color:#121212; margin-right: 0;">Salvar Alterações</button>
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button type="button" class="btn-site" onclick="fecharModal()" style="background:#495057; margin:0;">Cancelar</button>
+                    <button type="submit" class="btn-site" style="background:#f3cd4a; color:#121212; margin:0;">Salvar</button>
                 </div>
             </form>
         </div>
@@ -228,22 +140,13 @@
 
     <script>
         function abrirModalEditar(id, titulo, data, descricao) {
-            // Insere os valores antigos nas caixas do formulário automaticamente
             document.getElementById('edit_titulo').value = titulo;
             document.getElementById('edit_data').value = data;
             document.getElementById('edit_descricao').value = descricao;
-            
-            // Aponta a rota de destino do formulário para o ID correto do evento
             document.getElementById('formEditarEvento').action = "/admin/evento/editar/" + id;
-            
-            // Exibe o modal na tela de forma centralizada
             document.getElementById('modalEditar').style.display = 'flex';
         }
-
-        function fecharModal() {
-            // Oculta o modal
-            document.getElementById('modalEditar').style.display = 'none';
-        }
+        function fecharModal() { document.getElementById('modalEditar').style.display = 'none'; }
     </script>
 </body>
 </html>

@@ -1,30 +1,26 @@
 import os
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_mail import Mail, Message
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 app = Flask(__name__)
-# Chave secreta necessária para gerir as sessões e mensagens flash
 app.secret_key = os.environ.get("SECRET_KEY", "troque-esta-chave-em-producao")
 
-# ── CONFIGURAÇÃO DE E-MAIL (FLASK-MAIL) ───────────────────────────────────────
+# ── CONFIGURAÇÃO DE E-MAIL ───────────────────────────────────────────────────
 app.config["MAIL_SERVER"]         = os.environ.get("MAIL_SERVER",   "smtp.gmail.com")
 app.config["MAIL_PORT"]           = int(os.environ.get("MAIL_PORT", 587))
 app.config["MAIL_USE_TLS"]        = True
 app.config["MAIL_USERNAME"]       = os.environ.get("MAIL_USERNAME", "comcatraiodeluz@gmail.com")
-
-# ⚠️ ATENÇÃO: Substitui as letras abaixo pelas 16 letras da Senha de App que vais gerar na Google
 app.config["MAIL_PASSWORD"]       = os.environ.get("MAIL_PASSWORD", "fnmn nlxm cuai plnv") 
 app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_USERNAME", "comcatraiodeluz@gmail.com")
 
 mail = Mail(app)
 
-# ── CONFIGURAÇÃO DO FLASK-LOGIN (CONTROLO DE ACESSO) ──────────────────────────
+# ── CONFIGURAÇÃO DO FLASK-LOGIN ──────────────────────────────────────────────
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-login_manager.login_message = 'Por favor, faça login para aceder a esta página.'
 
-# Classe simples para o utilizador administrador
 class Usuario(UserMixin):
     def __init__(self, id):
         self.id = id
@@ -35,10 +31,9 @@ def load_user(user_id):
         return Usuario("admin")
     return None
 
-# Lista na memória do computador para guardar as mensagens enviadas e exibi-las no Painel Admin
 MENSAGENS_DB = []
+ORACAO_DB = []
 
-# ── DADOS DA ORGANIZAÇÃO ───────────────────────────────────────────────────────
 ORG = {
     "nome": "Raio de Luz",
     "slogan": "Unidos pela fé, movidos pelo amor",
@@ -46,9 +41,10 @@ ORG = {
     "visao": "Ser uma comunidade de referência, formando pessoas transformadas pelo Evangelho.",
     "email": "comcatraiodeluz@gmail.com",
     "telefone": "+55 (45) 99955-0227",
-    "endereco": "Av. Roberto Fachini , 377 — Toledo, PR",
+    "endereco": "Comunidade 100% Online — Onde você estiver!",
     "instagram": "https://instagram.com/comunidaderaiodeluz",
     "youtube": "https://youtube.com/@raiodeltuz",
+    "id_video_ao_vivo": "dQw4w9WgXcQ"
 }
 
 MINISTERIOS = [
@@ -58,9 +54,14 @@ MINISTERIOS = [
     {"icone": "📖", "nome": "Formação", "descricao": "Cursos, retiros e encontros para crescimento espiritual e humano."},
     {"icone": "🌍", "nome": "Missão", "descricao": "Equipes missionárias que levam a fé para além das fronteiras."},
     {"icone": "👶", "nome": "Infância & Juventude", "descricao": "Espaços especiais para crianças, adolescentes e jovens."},
- ]
+]
 
-# Lista de Eventos estruturada com ID para permitir a edição no painel administrativo
+# GRUPOS ONLINE COM DIAS VIA NÚMERO (0=Segunda, 1=Terça, 2=Quarta, 3=Quinta, 4=Sexta, 5=Sábado, 6=Domingo)
+GRUPOS_ONLINE = [
+    {"id": 1, "nome": "Conexão Jovem", "dia_nome": "Terça-feira", "dia_semana": 1, "horario": "20:00", "lider": "Coordenador da Comunidade", "link": "https://meet.google.com/abc-defg-hij"},
+    {"id": 2, "nome": "Conexão Jovem", "dia_nome": "Sábado", "dia_semana": 5, "horario": "19:30", "lider": "Coordenador da Comunidade", "link": "https://meet.google.com/xyz-uvw-rst"},
+]
+
 EVENTOS = [
     {
         "id": 1, 
@@ -73,7 +74,9 @@ EVENTOS = [
 # ── ROTAS PÚBLICAS DO SITE ────────────────────────────────────────────────────
 @app.route("/")
 def index():
-    return render_template("index.html", org=ORG, ministerios=MINISTERIOS, eventos=EVENTOS)
+    # Pega o número do dia da semana de hoje (0 a 6)
+    dia_hoje = datetime.now().weekday()
+    return render_template("index.html", org=ORG, ministerios=MINISTERIOS, eventos=EVENTOS, grupos=GRUPOS_ONLINE, dia_hoje=dia_hoje)
 
 @app.route("/sobre")
 def sobre():
@@ -97,85 +100,72 @@ def contato():
         if not nome or not email or not mensagem:
             flash("Por favor, preencha todos os campos.", "erro")
         else:
-            # 1. Guarda a mensagem localmente para que apareça no painel admin do site
-            MENSAGENS_DB.append({
-                "nome": nome, 
-                "email": email, 
-                "mensagem": mensagem, 
-                "assunto": "Nova Mensagem do Site"
-            })
-            
-            # 2. Tenta enviar por e-mail real utilizando o Flask-Mail
+            MENSAGENS_DB.append({"nome": nome, "email": email, "mensagem": mensagem, "assunto": "Nova Mensagem do Site"})
             try:
-                # E-mail com a mensagem para a administração da comunidade
-                msg = Message(
-                    subject=f"[{ORG['nome']}] Nova mensagem de {nome}",
-                    recipients=[ORG["email"]],
-                    body=f"Nome: {nome}\nE-mail: {email}\n\nMensagem:\n{mensagem}",
-                )
+                msg = Message(subject=f"[{ORG['nome']}] Nova mensagem de {nome}", recipients=[ORG["email"]], body=f"Nome: {nome}\nE-mail: {email}\n\nMensagem:\n{mensagem}")
                 mail.send(msg)
-
-                # E-mail automático de confirmação para o utilizador que enviou
-                confirmacao = Message(
-                    subject=f"Recebemos sua mensagem — {ORG['nome']}",
-                    recipients=[email],
-                    body=f"Olá, {nome}!\n\nRecebemos sua mensagem e entraremos em contato em breve.\n\nEquipe {ORG['nome']}",
-                )
-                mail.send(confirmacao)
-
-                flash("Mensagem enviada com sucesso! Você receberá uma confirmação por e-mail.", "sucesso")
+                flash("Mensagem enviada com sucesso!", "sucesso")
                 return redirect(url_for("contato"))
-
             except Exception as e:
-                app.logger.error(f"Erro ao enviar e-mail: {e}")
-                # Avisa que a mensagem foi guardada no painel, apesar de o e-mail ter falhado devido à senha
-                flash("Guardamos a sua mensagem no painel do site, mas houve um problema temporário com o servidor de e-mail.", "sucesso")
+                flash("Guardamos a sua mensagem no painel do site, mas o servidor de e-mail falhou.", "sucesso")
                 return redirect(url_for("contato"))
-
     return render_template("contato.html", org=ORG)
 
-# ── ROTAS DE AUTENTICAÇÃO E PAINEL ADMINISTRATIVO ─────────────────────────────
+@app.route("/oracao", methods=["GET", "POST"])
+def oracao():
+    if request.method == "POST":
+        nome = request.form.get("nome", "Anónimo").strip() or "Anónimo"
+        pedido = request.form.get("pedido", "").strip()
+        if not pedido:
+            flash("Por favor, escreva o seu pedido de oração.", "erro")
+        else:
+            ORACAO_DB.append({"nome": nome, "pedido": pedido})
+            flash("O seu pedido de oração foi recebido!", "sucesso")
+            return redirect(url_for("oracao"))
+    return render_template("oracao.html", org=ORG)
+
+# ── PAINEL ADMINISTRATIVO ─────────────────────────────────────────────────────
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('admin_dashboard'))
-    
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        
-        # Dados de acesso padrão do teu site
         if username == 'admin' and password == 'Luz123@Comunidade':
             user = Usuario('admin')
             login_user(user)
             return redirect(url_for('admin_dashboard'))
         else:
             flash('Usuário ou senha incorretos.', 'erro')
-            
     return render_template('login.html', org=ORG)
 
 @app.route('/admin')
 @login_required
 def admin_dashboard():
-    # Passa também a lista de eventos para poder ser gerenciada no admin.html
-    return render_template('admin.html', org=ORG, mensagens=MENSAGENS_DB, eventos=EVENTOS)
+    return render_template('admin.html', org=ORG, mensagens=MENSAGENS_DB, eventos=EVENTOS, oracoes=ORACAO_DB, grupos=GRUPOS_ONLINE)
 
 @app.route("/admin/evento/editar/<int:evento_id>", methods=["POST"])
 @login_required
 def editar_evento(evento_id):
-    novo_titulo = request.form.get("titulo", "").strip()
-    nova_data = request.form.get("data", "").strip()
-    nova_descricao = request.form.get("descricao", "").strip()
-    
-    # Procura o evento na lista global e altera os dados
     for ev in EVENTOS:
         if ev.get("id") == evento_id:
-            ev["titulo"] = novo_titulo
-            ev["data"] = nova_data
-            ev["descricao"] = nova_descricao
+            ev["titulo"] = request.form.get("titulo", "").strip()
+            ev["data"] = request.form.get("data", "").strip()
+            ev["descricao"] = request.form.get("descricao", "").strip()
             break
-            
     flash("Evento atualizado com sucesso!", "sucesso")
+    return redirect(url_for("admin_dashboard"))
+
+# ROTA NOVA: EDITAR LINK DO MEET DO GRUPO
+@app.route("/admin/grupo/editar/<int:grupo_id>", methods=["POST"])
+@login_required
+def editar_grupo(grupo_id):
+    for gp in GRUPOS_ONLINE:
+        if gp.get("id") == grupo_id:
+            gp["link"] = request.form.get("link", "").strip()
+            break
+    flash("Link do grupo online atualizado!", "sucesso")
     return redirect(url_for("admin_dashboard"))
 
 @app.route('/logout')
@@ -185,6 +175,5 @@ def logout():
     return redirect(url_for('index'))
 
 if __name__ == "__main__":
-    # Lê a porta que a Render oferece ou usa a 5000 por padrão se for no PC
     porta = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=porta)

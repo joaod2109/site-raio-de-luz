@@ -3,7 +3,6 @@
 
 {% block content %}
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="hero-content">
@@ -18,7 +17,6 @@
   <div class="hero-scroll">↓</div>
 </section>
 
-<!-- MISSÃO RÁPIDA -->
 <section class="section mission-strip">
   <div class="container">
     <div class="mission-grid">
@@ -43,7 +41,6 @@
   </div>
 </section>
 
-<!-- MINISTÉRIOS (preview) -->
 <section class="section">
   <div class="container">
     <div class="section-header">
@@ -65,29 +62,56 @@
   </div>
 </section>
 
-<!-- EVENTOS (preview) -->
 <section class="section section--alt">
-  <div class="container">
+  <div class="container" style="text-align: center; max-width: 800px; margin: 0 auto;">
     <div class="section-header">
-      <p class="section-eyebrow">Agenda</p>
-      <h2>Próximos Eventos</h2>
+      <p class="section-eyebrow">Mídia</p>
+      <h2>📺 Nossa Transmissão Ao Vivo</h2>
     </div>
-    <div class="eventos-list">
-      {% for e in eventos %}
-      <div class="evento-item">
-        <div class="evento-data">{{ e.data }}</div>
-        <div class="evento-info">
-          <h3>{{ e.nome }}</h3>
-          <p>{{ e.local }} · {{ e.hora }}</p>
-        </div>
-        <a href="{{ url_for('eventos') }}" class="evento-link">Ver detalhes →</a>
-      </div>
-      {% endfor %}
+    <p style="color: #aaa; margin-bottom: 25px;">Acompanhe nossas reuniões, cultos e mensagens em tempo real diretamente da sua casa!</p>
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 8px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+        <iframe src="https://www.youtube.com/embed/{{ org.id_video_ao_vivo }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allowfullscreen></iframe>
     </div>
   </div>
 </section>
 
-<!-- CTA FINAL -->
+<section class="section">
+  <div class="container">
+    <div class="section-header" style="text-align: center;">
+      <p class="section-eyebrow">Comunidade</p>
+      <h2>🌐 Nossos Grupos de Conexão</h2>
+      <p style="color: #aaa; margin-top: 10px;">Participe de nossas salas virtuais. O link de acesso fica disponível automaticamente nos dias de reunião!</p>
+    </div>
+    
+    <div style="display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; margin-top: 40px;">
+        {% for grupo in grupos %}
+            <div style="background: #1e1e1e; border: 1px solid #333; padding: 25px; border-radius: 8px; width: 300px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                <div>
+                    <h3 style="color: #ffffff; margin-top: 0; margin-bottom: 8px; font-size: 20px;">{{ grupo.nome }}</h3>
+                    <p style="color: #aaa; font-size: 14px; margin-bottom: 20px;">Liderança: {{ grupo.lider }}</p>
+                </div>
+
+                <div>
+                    {% if grupo.dia_semana == dia_hoje %}
+                        <div style="background: #1b2e1b; color: #81c784; padding: 8px; border-radius: 4px; font-size: 13px; font-weight: bold; margin-bottom: 12px; border: 1px solid #2e7d32; text-transform: uppercase; letter-spacing: 0.5px;">
+                            🔴 Acontecendo Hoje às {{ grupo.horario }}
+                        </div>
+                        <a href="{{ grupo.link }}" target="_blank" style="display: block; background: #2e7d32; color: #fff; text-decoration: none; padding: 12px; border-radius: 4px; font-weight: bold; transition: background 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" onmouseover="this.style.background='#388e3c'" onmouseout="this.style.background='#2e7d32'">
+                            💻 Entrar no Meet / Zoom
+                        </a>
+                    
+                    {% else %}
+                        <div style="background: #252525; color: #f3cd4a; padding: 12px; border-radius: 4px; font-size: 14px; border: 1px solid #333; font-weight: bold; letter-spacing: 0.5px;">
+                            📅 {{ grupo.dia_nome }} às {{ grupo.horario }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+  </div>
+</section>
+
 <section class="section cta-section">
   <div class="container">
     <div class="cta-box">
