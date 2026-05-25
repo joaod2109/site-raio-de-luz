@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}{{ org.nome }} — {{ org.slogan }}{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Bem-vindo à</p>
+    <h1 class="hero-title">{{ org.nome }}</h1>
+    <p class="hero-sub">{{ org.slogan }}</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('sobre') }}" class="btn btn--primary">Conheça nossa história</a>
+      <a href="{{ url_for('contato') }}" class="btn btn--outline">Fale conosco</a>
+    </div>
+  </div>
+  <div class="hero-scroll">↓</div>
+</section>
+
+<!-- MISSÃO RÁPIDA -->
+<section class="section mission-strip">
+  <div class="container">
+    <div class="mission-grid">
+      <div class="mission-item">
+        <span class="mission-icon">✦</span>
+        <h3>Missão</h3>
+        <p>{{ org.missao }}</p>
+      </div>
+      <div class="mission-divider"></div>
+      <div class="mission-item">
+        <span class="mission-icon">◈</span>
+        <h3>Visão</h3>
+        <p>{{ org.visao }}</p>
+      </div>
+      <div class="mission-divider"></div>
+      <div class="mission-item">
+        <span class="mission-icon">❧</span>
+        <h3>Valores</h3>
+        <p>Fé, amor, serviço e alegria como pilares de toda a nossa caminhada.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MINISTÉRIOS (preview) -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-eyebrow">O que fazemos</p>
+      <h2>Nossos Ministérios</h2>
+    </div>
+    <div class="cards-grid">
+      {% for m in ministerios[:3] %}
+      <div class="card">
+        <span class="card-icon">{{ m.icone }}</span>
+        <h3>{{ m.nome }}</h3>
+        <p>{{ m.descricao }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="section-footer">
+      <a href="{{ url_for('ministerios') }}" class="btn btn--primary">Ver todos os ministérios</a>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTOS (preview) -->
+<section class="section section--alt">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-eyebrow">Agenda</p>
+      <h2>Próximos Eventos</h2>
+    </div>
+    <div class="eventos-list">
+      {% for e in eventos %}
+      <div class="evento-item">
+        <div class="evento-data">{{ e.data }}</div>
+        <div class="evento-info">
+          <h3>{{ e.nome }}</h3>
+          <p>{{ e.local }} · {{ e.hora }}</p>
+        </div>
+        <a href="{{ url_for('eventos') }}" class="evento-link">Ver detalhes →</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="section cta-section">
+  <div class="container">
+    <div class="cta-box">
+      <h2>Venha fazer parte desta história</h2>
+      <p>Você é bem-vindo aqui. Dê o primeiro passo e nos encontre.</p>
+      <a href="{{ url_for('contato') }}" class="btn btn--light">Entre em contato</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

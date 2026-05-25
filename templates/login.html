@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Comunidade Raio de Luz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+        <div class="admin-container" style="width: 100%; max-width: 400px;">
+            <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary-color);">Painel Administrativo</h2>
+            
+            <!-- Exibe mensagens de erro caso o login falhe -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div style="color: #721c24; background-color: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px; text-align: center;">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('login') }}">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px;">Usuário</label>
+                    <input type="text" name="username" required style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color);">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 5px;">Senha</label>
+                    <input type="password" name="password" required style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color);">
+                </div>
+                <button type="submit" class="btn" style="width: 100%; padding: 12px; cursor: pointer;">Entrar</button>
+            </form>
+            
+            <p style="text-align: center; margin-top: 15px;">
+                <a href="{{ url_for('index') }}" style="color: var(--text-muted); text-decoration: none;">← Voltar ao site</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

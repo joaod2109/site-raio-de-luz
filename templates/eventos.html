@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Eventos — {{ org.nome }}{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+  <div class="container">
+    <p class="section-eyebrow">Agenda</p>
+    <h1>Eventos</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container container--narrow">
+    <div class="eventos-list eventos-list--full">
+      {% for e in eventos %}
+      <div class="evento-item evento-item--full">
+        <div class="evento-data">{{ e.data }}</div>
+        <div class="evento-info">
+          <h3>{{ e.nome }}</h3>
+          <p><strong>Local:</strong> {{ e.local }}</p>
+          <p><strong>Horário:</strong> {{ e.hora }}</p>
+        </div>
+        <a href="{{ url_for('contato') }}" class="btn btn--primary">Quero ir</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Ministérios — {{ org.nome }}{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+  <div class="container">
+    <p class="section-eyebrow">O que fazemos</p>
+    <h1>Ministérios</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <p class="intro-text">Cada ministério é um espaço de serviço, encontro e crescimento. Encontre o lugar onde seu coração ressoa.</p>
+    <div class="cards-grid cards-grid--full">
+      {% for m in ministerios %}
+      <div class="card card--ministry">
+        <span class="card-icon">{{ m.icone }}</span>
+        <h3>{{ m.nome }}</h3>
+        <p>{{ m.descricao }}</p>
+        <a href="{{ url_for('contato') }}" class="card-link">Quero participar →</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

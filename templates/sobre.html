@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Sobre — {{ org.nome }}{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+  <div class="container">
+    <p class="section-eyebrow">Nossa história</p>
+    <h1>Sobre nós</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container container--narrow">
+    <div class="about-block">
+      <h2>Quem somos</h2>
+      <p>Somos uma comunidade nascida do desejo de viver o Evangelho de forma autêntica e criativa. Acreditamos que cada pessoa carrega um chamado único, e nossa missão é ajudá-la a descobrir e viver esse chamado com alegria.</p>
+      <p>Desde nossa fundação, crescemos como família que ora, serve e evangeliza. Espalhados por diferentes bairros e cidades, mantemos a essência de uma comunidade unida: a fé compartilhada.</p>
+    </div>
+
+    <div class="values-grid">
+      <div class="value-card">
+        <span>01</span>
+        <h3>Missão</h3>
+        <p>{{ org.missao }}</p>
+      </div>
+      <div class="value-card">
+        <span>02</span>
+        <h3>Visão</h3>
+        <p>{{ org.visao }}</p>
+      </div>
+      <div class="value-card">
+        <span>03</span>
+        <h3>Espiritualidade</h3>
+        <p>Vivemos uma espiritualidade mariana, inspirados em Maria como modelo de acolhimento, serviço e entrega total.</p>
+      </div>
+      <div class="value-card">
+        <span>04</span>
+        <h3>Comunhão</h3>
+        <p>Acreditamos na força da comunidade. Juntos somos mais fortes, mais alegres e mais capazes de transformar o mundo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

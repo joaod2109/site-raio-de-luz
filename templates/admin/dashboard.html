@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Raio de Luz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid var(--border-color); padding-bottom: 15px;">
+        <h1 style="color: var(--primary-color);">Painel de Controle Administrativo</h1>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn" style="background: gray; margin-right: 10px;">Ver Site</a>
+            <a href="{{ url_for('logout') }}" class="btn" style="background: #dc3545;">Sair</a>
+        </div>
+    </div>
+
+    <!-- Seção de Mensagens Recebidas -->
+    <div class="admin-container">
+        <h3>📩 Mensagens de Contato Recebidas</h3>
+        <p style="color: var(--text-muted); margin-bottom: 15px;">Abaixo estão listadas as mensagens enviadas através do formulário do site.</p>
+        
+        <div class="table-responsive">
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border-color); background: rgba(0,0,0,0.05);">
+                        <th style="padding: 12px;">Nome</th>
+                        <th style="padding: 12px;">E-mail</th>
+                        <th style="padding: 12px;">Assunto</th>
+                        <th style="padding: 12px;">Mensagem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if mensagens %}
+                        {% for msg in mensagens %}
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: 12px; font-weight: bold;">{{ msg.nome }}</td>
+                                <td style="padding: 12px;">{{ msg.email }}</td>
+                                <td style="padding: 12px;"><span class="badge badge-unread">{{ msg.assunto }}</span></td>
+                                <td style="padding: 12px; color: var(--text-color);">{{ msg.mensagem }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" style="padding: 20px; text-align: center; color: var(--text-muted);">
+                                Nenhuma mensagem recebida até ao momento.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>
