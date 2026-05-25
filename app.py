@@ -44,7 +44,7 @@ ORG = {
     "endereco": "Comunidade 100% Online — Onde você estiver!",
     "instagram": "https://instagram.com/comunidaderaiodeluz",
     "youtube": "https://youtube.com/@raiodeltuz",
-    "id_video_ao_vivo": "dQw4w9WgXcQ"
+    "id_video_ao_vivo": "HlG5T7FGHng"
 }
 
 MINISTERIOS = [
@@ -57,8 +57,8 @@ MINISTERIOS = [
 ]
 
 GRUPOS_ONLINE = [
-    {"id": 1, "nome": "Conexão Jovem", "dia_nome": "Terça-feira", "dia_semana": 1, "horario": "20:00", "lider": "Lucas & Sara", "link": "https://meet.google.com/abc-defg-hij"},
-    {"id": 2, "nome": "Célula Famílias", "dia_nome": "Quinta-feira", "dia_semana": 3, "horario": "19:30", "lider": "Roberto & Maria", "link": "https://zoom.us/j/123456789"},
+    {"id": 1, "nome": "Conexão Jovem", "dia_nome": "Quinta-feira", "dia_semana": 3, "horario": "20:00", "lider": "Coordenadores", "link": "https://meet.google.com/abc-defg-hij"},
+    {"id": 2, "nome": "Conexão Jovem", "dia_nome": "Sábado", "dia_semana": 5, "horario": "20:00", "lider": "Coordenadores", "link": "https://zoom.us/j/123456789"},
 ]
 
 EVENTOS = [
@@ -72,9 +72,8 @@ EVENTOS = [
 
 # BANCO DE DADOS DE FOTOS INICIAIS (Links temporários que você poderá mudar no Admin)
 FOTOS_DB = [
-    {"id": 1, "url": "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1000", "legenda": "Nossa última reunião de oração online!"},
-    {"id": 2, "url": "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1000", "legenda": "Momento de partilha e conexão entre irmãos."},
 ]
+   
 
 def obter_dia_semana_brasil():
     fuso_brasil = timezone(timedelta(hours=-3))
@@ -106,7 +105,7 @@ def contato():
         email    = request.form.get("email", "").strip()
         mensagem = request.form.get("mensagem", "").strip()
 
-        if not nome or not email or not message:
+        if not nome or not email or not mensagem:
             flash("Por favor, preencha todos os campos.", "erro")
         else:
             MENSAGENS_DB.append({"nome": nome, "email": email, "mensagem": mensagem, "assunto": "Nova Mensagem do Site"})
