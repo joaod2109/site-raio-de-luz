@@ -18,6 +18,8 @@
         .btn-logout { background-color: #bb2d3b; color: white; padding: 10px 18px; text-decoration: none; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; }
         .btn-site { background-color: #495057; color: white; padding: 10px 18px; text-decoration: none; border-radius: 4px; font-weight: bold; margin-right: 10px; border: none; cursor: pointer; display: inline-block; }
         .btn-site:hover { background-color: #6c757d; }
+        .btn-salvar { background-color: #f3cd4a; color: #121212; padding: 10px 20px; border-radius: 4px; font-weight: bold; border: none; cursor: pointer; }
+        .btn-salvar:hover { background-color: #e0b833; }
         .badge-origem { background: #2c2200; color: #f3cd4a; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid #614e0b; }
         .badge-oracao { background: #1b2e1b; color: #81c784; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid #2e7d32; }
         .alert-flash { padding: 15px; margin-top: 15px; border-radius: 4px; font-weight: bold; background-color: #2e7d32; color: #fff; }
@@ -53,6 +55,18 @@
     {% endwith %}
 
     <div class="admin-box">
+        <h3>📺 Configuração da Transmissão Ao Vivo (YouTube)</h3>
+        <p style="color: #aaa; margin-bottom: 15px;">Cole aqui apenas as letras finais do link do vídeo do YouTube (ID do Vídeo). Exemplo: se o link for https://www.youtube.com/watch?v=<b>AbCdEfGh123</b>, coloque <b>AbCdEfGh123</b>.</p>
+        <form method="POST" action="{{ url_for('editar_organizacao') }}" style="display: flex; gap: 15px; align-items: flex-end;">
+            <div style="flex: 1;">
+                <label>ID do Vídeo do YouTube Atual:</label>
+                <input type="text" name="id_video_ao_vivo" value="{{ org.id_video_ao_vivo }}" required>
+            </div>
+            <button type="submit" class="btn-salvar">Atualizar Transmissão</button>
+        </form>
+    </div>
+
+    <div class="admin-box" style="margin-top: 30px;">
         <h3>📩 Mensagens de Contato Recebidas</h3>
         <table>
             <thead>
@@ -76,7 +90,7 @@
     </div>
 
     <div class="admin-box" style="margin-top: 40px;">
-        <h3>🙏 Pedidos de Oração Recebidos</h3>
+        <h3>🙏 Pedidos de Oração Recebidas</h3>
         <table>
             <thead>
                 <tr><th>Quem Pediu</th><th>Status</th><th>Pedido de Oração</th></tr>

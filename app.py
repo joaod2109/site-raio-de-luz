@@ -44,7 +44,7 @@ ORG = {
     "endereco": "Comunidade 100% Online — Onde você estiver!",
     "instagram": "https://instagram.com/comunidaderaiodeluz",
     "youtube": "https://youtube.com/@raiodeltuz",
-    "id_video_ao_vivo": "HlG5T7FGHng"
+    "id_video_ao_vivo": "dQw4w9WgXcQ"
 }
 
 MINISTERIOS = [
@@ -149,6 +149,14 @@ def login():
 def admin_dashboard():
     return render_template('admin.html', org=ORG, mensagens=MENSAGENS_DB, eventos=EVENTOS, oracoes=ORACAO_DB, grupos=GRUPOS_ONLINE)
 
+# ROTA PARA EDITAR O VÍDEO DO YOUTUBE DIRETAMENTE NO PAINEL
+@app.route("/admin/organizacao/editar", methods=["POST"])
+@login_required
+def editar_organizacao():
+    ORG["id_video_ao_vivo"] = request.form.get("id_video_ao_vivo", "").strip()
+    flash("Configurações da transmissão atualizadas com sucesso!", "sucesso")
+    return redirect(url_for("admin_dashboard"))
+
 @app.route("/admin/evento/editar/<int:evento_id>", methods=["POST"])
 @login_required
 def editar_evento(evento_id):
@@ -161,16 +169,23 @@ def editar_evento(evento_id):
     flash("Evento atualizado com sucesso!", "sucesso")
     return redirect(url_for("admin_dashboard"))
 
+# CORRIGIDO: Removido o 'group_id' inválido que quebrava o sistema com erro 500
 @app.route("/admin/grupo/editar/<int:grupo_id>", methods=["POST"])
 @login_required
 def editar_grupo(grupo_id):
     for gp in GRUPOS_ONLINE:
-        if gp.get("id") == group_id or gp.get("id") == grupo_id:
+        if gp.get("id") == grupo_id:
             gp["nome"] = request.form.get("nome", "").strip()
             gp["lider"] = request.form.get("lider", "").strip()
             gp["horario"] = request.form.get("horario", "").strip()
             gp["dia_nome"] = request.form.get("dia_nome", "").strip()
-            gp["dia_semana"] = int(request.form.get("dia_semana"))
+            
+            # Garante que o dia da semana seja processado como um número inteiro
+            try:
+                gp["dia_semana"] = int(request.form.get("dia_semana", 0))
+            except (ValueError, TypeError):
+                gp["dia_semana"] = 0
+                
             gp["link"] = request.form.get("link", "").strip()
             break
     flash("Grupo online atualizado com sucesso!", "sucesso")
