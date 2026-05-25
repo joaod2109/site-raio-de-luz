@@ -56,7 +56,7 @@
 
     <div class="admin-box">
         <h3>📺 Configuração da Transmissão Ao Vivo (YouTube)</h3>
-        <p style="color: #aaa; margin-bottom: 15px;">Cole aqui apenas as letras finais do link do vídeo do YouTube (ID do Vídeo). Exemplo: se o link for https://www.youtube.com/watch?v=<b>AbCdEfGh123</b>, coloque <b>AbCdEfGh123</b>.</p>
+        <p style="color: #aaa; margin-bottom: 15px;">Cole aqui apenas as letras finais do link do vídeo do YouTube (ID do Vídeo).</p>
         <form method="POST" action="{{ url_for('editar_organizacao') }}" style="display: flex; gap: 15px; align-items: flex-end;">
             <div style="flex: 1;">
                 <label>ID do Vídeo do YouTube Atual:</label>
@@ -64,6 +64,50 @@
             </div>
             <button type="submit" class="btn-salvar">Atualizar Transmissão</button>
         </form>
+    </div>
+
+    <div class="admin-box" style="margin-top: 30px;">
+        <h3>📸 Gerenciar Mural de Fotos Rotativo (Meets / Eventos)</h3>
+        <p style="color: #aaa; margin-bottom: 15px;">Adicione links de fotos hospedadas na internet para que apareçam passando sozinhas na página inicial.</p>
+        
+        <form method="POST" action="{{ url_for('adicionar_foto') }}" style="background: #252525; padding: 20px; border-radius: 6px; border: 1px solid #333; margin-bottom: 25px;">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <div style="flex: 2; min-width: 250px;">
+                    <label>Link Direto da Imagem (URL):</label>
+                    <input type="text" name="url" placeholder="https://exemplo.com/sua-foto.jpg" required>
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <label>Legenda da Foto:</label>
+                    <input type="text" name="legenda" placeholder="Reunião das Terças..." required>
+                </div>
+            </div>
+            <button type="submit" class="btn-salvar" style="margin-top: 15px;">Adicionar ao Mural</button>
+        </form>
+
+        <h4>Fotos Ativas no Carrossel:</h4>
+        <table>
+            <thead>
+                <tr><th>Miniatura</th><th>Legenda</th><th>Link da Imagem</th><th>Ação</th></tr>
+            </thead>
+            <tbody>
+                {% if fotos %}
+                    {% for f in fotos %}
+                        <tr>
+                            <td><img src="{{ f.url }}" style="width: 70px; height: 45px; object-fit: cover; border-radius: 4px; border: 1px solid #444;"></td>
+                            <td style="font-weight: bold; color: #fff;">{{ f.legenda }}</td>
+                            <td style="font-family: monospace; font-size: 12px; color: #888; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ f.url }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('deletar_foto', foto_id=f.id) }}" style="display:inline;">
+                                    <button type="submit" style="background: #bb2d3b; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">Remover</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="4" style="text-align: center; color: #777;">Nenhuma foto cadastrada no mural.</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
     </div>
 
     <div class="admin-box" style="margin-top: 30px;">
@@ -90,7 +134,7 @@
     </div>
 
     <div class="admin-box" style="margin-top: 40px;">
-        <h3>🙏 Pedidos de Oração Recebidas</h3>
+        <h3>🙏 Pedidos de Oração Recebidos</h3>
         <table>
             <thead>
                 <tr><th>Quem Pediu</th><th>Status</th><th>Pedido de Oração</th></tr>

@@ -56,7 +56,6 @@ MINISTERIOS = [
     {"icone": "👶", "nome": "Infância & Juventude", "descricao": "Espaços especiais para crianças, adolescentes e jovens."},
 ]
 
-# GRUPOS ONLINE INICIAIS
 GRUPOS_ONLINE = [
     {"id": 1, "nome": "Conexão Jovem", "dia_nome": "Terça-feira", "dia_semana": 1, "horario": "20:00", "lider": "Lucas & Sara", "link": "https://meet.google.com/abc-defg-hij"},
     {"id": 2, "nome": "Célula Famílias", "dia_nome": "Quinta-feira", "dia_semana": 3, "horario": "19:30", "lider": "Roberto & Maria", "link": "https://zoom.us/j/123456789"},
@@ -71,7 +70,12 @@ EVENTOS = [
     }
 ]
 
-# Função auxiliar para garantir o dia da semana correto no fuso horário do Brasil (UTC-3)
+# BANCO DE DADOS DE FOTOS INICIAIS (Links temporários que você poderá mudar no Admin)
+FOTOS_DB = [
+    {"id": 1, "url": "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1000", "legenda": "Nossa última reunião de oração online!"},
+    {"id": 2, "url": "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=1000", "legenda": "Momento de partilha e conexão entre irmãos."},
+]
+
 def obter_dia_semana_brasil():
     fuso_brasil = timezone(timedelta(hours=-3))
     return datetime.now(fuso_brasil).weekday()
@@ -80,7 +84,8 @@ def obter_dia_semana_brasil():
 @app.route("/")
 def index():
     dia_hoje = obter_dia_semana_brasil()
-    return render_template("index.html", org=ORG, ministerios=MINISTERIOS, eventos=EVENTOS, grupos=GRUPOS_ONLINE, dia_hoje=dia_hoje)
+    # Enviamos a lista de fotos para a página inicial
+    return render_template("index.html", org=ORG, ministerios=MINISTERIOS, eventos=EVENTOS, grupos=GRUPOS_ONLINE, dia_hoje=dia_hoje, fotos=FOTOS_DB)
 
 @app.route("/sobre")
 def sobre():
@@ -101,7 +106,7 @@ def contato():
         email    = request.form.get("email", "").strip()
         mensagem = request.form.get("mensagem", "").strip()
 
-        if not nome or not email or not mensagem:
+        if not nome or not email or not message:
             flash("Por favor, preencha todos os campos.", "erro")
         else:
             MENSAGENS_DB.append({"nome": nome, "email": email, "mensagem": mensagem, "assunto": "Nova Mensagem do Site"})
@@ -110,7 +115,7 @@ def contato():
                 mail.send(msg)
                 flash("Mensagem enviada com sucesso!", "sucesso")
                 return redirect(url_for("contato"))
-            except Exception as e:
+            except Exception:
                 flash("Guardamos a sua mensagem no painel do site, mas o servidor de e-mail falhou.", "sucesso")
                 return redirect(url_for("contato"))
     return render_template("contato.html", org=ORG)
@@ -147,14 +152,36 @@ def login():
 @app.route('/admin')
 @login_required
 def admin_dashboard():
-    return render_template('admin.html', org=ORG, mensagens=MENSAGENS_DB, eventos=EVENTOS, oracoes=ORACAO_DB, grupos=GRUPOS_ONLINE)
+    # Passamos as fotos também para o painel admin ser capaz de listar e excluir
+    return render_template('admin.html', org=ORG, mensagens=MENSAGENS_DB, eventos=EVENTOS, oracoes=ORACAO_DB, grupos=GRUPOS_ONLINE, fotos=FOTOS_DB)
 
-# ROTA PARA EDITAR O VÍDEO DO YOUTUBE DIRETAMENTE NO PAINEL
 @app.route("/admin/organizacao/editar", methods=["POST"])
 @login_required
 def editar_organizacao():
     ORG["id_video_ao_vivo"] = request.form.get("id_video_ao_vivo", "").strip()
     flash("Configurações da transmissão atualizadas com sucesso!", "sucesso")
+    return redirect(url_for("admin_dashboard"))
+
+# NOVAS ROTAS: GESTÃO DO MURAL DE FOTOS
+@app.route("/admin/foto/adicionar", methods=["POST"])
+@login_required
+def adicionar_foto():
+    url = request.form.get("url", "").strip()
+    legenda = request.form.get("legenda", "").strip()
+    if url:
+        novo_id = max([f["id"] for f in FOTOS_DB]) + 1 if FOTOS_DB else 1
+        FOTOS_DB.append({"id": novo_id, "url": url, "legenda": legenda})
+        flash("Nova foto adicionada ao mural com sucesso!", "sucesso")
+    else:
+        flash("O link da foto é obrigatório.", "erro")
+    return redirect(url_for("admin_dashboard"))
+
+@app.route("/admin/foto/deletar/<int:foto_id>", methods=["POST"])
+@login_required
+def deletar_foto(foto_id):
+    global FOTOS_DB
+    FOTOS_DB = [f for f in FOTOS_DB if f["id"] != foto_id]
+    flash("Foto removida do mural.", "sucesso")
     return redirect(url_for("admin_dashboard"))
 
 @app.route("/admin/evento/editar/<int:evento_id>", methods=["POST"])
@@ -169,7 +196,6 @@ def editar_evento(evento_id):
     flash("Evento atualizado com sucesso!", "sucesso")
     return redirect(url_for("admin_dashboard"))
 
-# CORRIGIDO: Removido o 'group_id' inválido que quebrava o sistema com erro 500
 @app.route("/admin/grupo/editar/<int:grupo_id>", methods=["POST"])
 @login_required
 def editar_grupo(grupo_id):
@@ -179,13 +205,10 @@ def editar_grupo(grupo_id):
             gp["lider"] = request.form.get("lider", "").strip()
             gp["horario"] = request.form.get("horario", "").strip()
             gp["dia_nome"] = request.form.get("dia_nome", "").strip()
-            
-            # Garante que o dia da semana seja processado como um número inteiro
             try:
                 gp["dia_semana"] = int(request.form.get("dia_semana", 0))
             except (ValueError, TypeError):
                 gp["dia_semana"] = 0
-                
             gp["link"] = request.form.get("link", "").strip()
             break
     flash("Grupo online atualizado com sucesso!", "sucesso")

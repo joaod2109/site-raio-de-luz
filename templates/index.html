@@ -62,20 +62,85 @@
   </div>
 </section>
 
-<section class="section section--alt">
+{% if fotos %}
+<section class="section section--alt" style="background: #181818;">
+  <div class="container" style="max-width: 900px; margin: 0 auto; text-align: center;">
+    <div class="section-header">
+      <p class="section-eyebrow">Nossa Vida</p>
+      <h2>📸 Registros da Nossa Comunidade</h2>
+      <p style="color: #aaa; margin-top: 10px;">Um pouquinho do que acontece nas nossas Meets, células e momentos de conexão online!</p>
+    </div>
+
+    <div style="position: relative; width: 100%; max-width: 800px; height: 450px; margin: 30px auto 0 auto; overflow: hidden; border-radius: 12px; border: 1px solid #333; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+      {% for f in fotos %}
+        <div class="meu-slide fade" style="display: none; width: 100%; height: 100%; position: relative;">
+          <img src="{{ f.url }}" style="width: 100%; height: 100%; object-fit: cover;">
+          {% if f.legenda %}
+            <div style="position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.75); color: #fff; padding: 15px; text-align: center; font-weight: bold; border-top: 1px solid #444; font-size: 16px;">
+              {{ f.legenda }}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <a onclick="mudarSlide(-1)" style="cursor: pointer; position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: white; font-weight: bold; font-size: 24px; background: rgba(0,0,0,0.5); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; user-select: none; text-decoration: none;">❮</a>
+      <a onclick="mudarSlide(1)" style="cursor: pointer; position: absolute; top: 50%; right: 15px; transform: translateY(-50%); color: white; font-weight: bold; font-size: 24px; background: rgba(0,0,0,0.5); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; user-select: none; text-decoration: none;">❯</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  let indexSlide = 0;
+  mostrarSlides();
+
+  function mostrarSlides() {
+    let i;
+    let slides = document.getElementsByClassName("meu-slide");
+    for (i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";  
+    }
+    indexSlide++;
+    if (indexSlide > slides.length) {indexSlide = 1}    
+    slides[indexSlide-1].style.display = "block";  
+    setTimeout(mostrarSlides, 4000); // Muda de foto a cada 4 segundos automaticamente
+  }
+
+  function mudarSlide(n) {
+    let slides = document.getElementsByClassName("meu-slide");
+    slides[indexSlide-1].style.display = "none";
+    indexSlide += n;
+    if (indexSlide > slides.length) {indexSlide = 1}
+    if (indexSlide < 1) {indexSlide = slides.length}
+    slides[indexSlide-1].style.display = "block";
+  }
+</script>
+
+<style>
+  .fade {
+    animation-name: fadeEffect;
+    animation-duration: 1s;
+  }
+  @keyframes fadeEffect {
+    from {opacity: .4} 
+    to {opacity: 1}
+  }
+</style>
+{% endif %}
+
+<section class="section">
   <div class="container" style="text-align: center; max-width: 800px; margin: 0 auto;">
     <div class="section-header">
       <p class="section-eyebrow">Mídia</p>
       <h2>📺 Nossa Transmissão Ao Vivo</h2>
     </div>
-    <p style="color: #aaa; margin-bottom: 25px;">Acompanhe nossas conexões em tempo real diretamente da sua casa! Enquanto não estamos online, assista uma pregação aí embaixo </p>
+    <p style="color: #aaa; margin-bottom: 25px;">Acompanhe nossas reuniões, cultos e mensagens em tempo real diretamente da sua casa!</p>
     <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 8px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
         <iframe src="https://www.youtube.com/embed/{{ org.id_video_ao_vivo }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allowfullscreen></iframe>
     </div>
   </div>
 </section>
 
-<section class="section">
+<section class="section section--alt">
   <div class="container">
     <div class="section-header" style="text-align: center;">
       <p class="section-eyebrow">Comunidade</p>
@@ -111,7 +176,7 @@
   </div>
 </section>
 
-<section class="section section--alt">
+<section class="section">
   <div class="container">
     <div class="section-header">
       <p class="section-eyebrow">Agenda</p>
